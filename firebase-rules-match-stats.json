@@ -1,0 +1,6 @@
+{
+  "matchStatsV13": {
+    ".read": "auth != null && (auth.uid === 'Y9ob3I1FgFgvhnDjVkQWRLptKPd2' || auth.uid === 'xXCO21qUL2gmYQPmBU71BPcGXHB3')",
+    ".write": "auth != null && (auth.uid === 'Y9ob3I1FgFgvhnDjVkQWRLptKPd2' || auth.uid === 'xXCO21qUL2gmYQPmBU71BPcGXHB3')"
+  }
+}

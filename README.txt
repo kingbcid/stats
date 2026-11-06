@@ -1,29 +1,24 @@
-COURTSIDE MATCH STATS V1.1 — PUBLIC PREVIEW
-Presented by KING Basketball Community
+COURTSIDE MATCH STATS V1.3 — KING BASKETBALL COMMUNITY
 
-PERUBAHAN
-- Master Roster dan menu Players dihapus.
-- Semua pemain dimasukkan manual saat membuat pertandingan (1 nama per baris).
-- Nama pemain yang sama pada dua tim diperbolehkan karena identitas bersifat per pertandingan.
-- Pertandingan Scrimmage, Antarkelas, Turnamen, Persahabatan.
-- HOME / AWAY, lima starter teratas, substitusi, statistik, Undo, CSV, History.
+Website: https://kingbcid.github.io/stats/
+Repository: kingbcid/stats
+Firebase project: king-basketball-communit-311a2
+Realtime Database statistics path: /matchStatsV13
 
-CARA PAKAI
-1. Upload seluruh file ke root repository basketball-match-stats di GitHub Pages.
-2. Buka New Match; isi nama tim dan pemain HOME/AWAY per baris.
-3. Klik Mulai Pertandingan dan catat statistik.
-4. Buka History untuk melihat pertandingan sebelumnya.
+INSTALL
+1. Upload all files from ZIP root to the ROOT of repository stats, replacing existing files.
+2. Ensure GitHub Pages publishes the correct branch/root.
+3. Realtime Database Rules were already published by the owner: the matchStatsV13 node must allow the operator UID. DO NOT replace the whole rules with the partial JSON in this ZIP.
+4. Firebase Authentication must contain operator@gmail.com with UID xXCO21qUL2gmYQPmBU71BPcGXHB3 in THIS KING project.
+5. Login with the existing password (not included).
+6. Create one match; other device opens the same active match and selects HOME or AWAY.
+7. Scoreboard clock is read-only and expects /matches/main/state. If the KING scoreboard uses a different match ID, change COURTSIDE_SCOREBOARD_MATCH in firebase-config.js.
+8. Player MIN is not automatically calculated in V1.3.
+9. Public view is not enabled. Internet required.
+10. If an older version is still visible after deploy, hard-refresh or clear website cache.
 
-BATASAN PREVIEW
-- Data tersimpan di localStorage browser/perangkat ini saja.
-- Belum mendukung dua operator pada dua perangkat secara real-time.
-- Game Clock Firebase hanya-baca bersifat percobaan.
-- Tidak ada login, database publik, atau publikasi Box Score online.
-- Sebelum menghapus data situs/browser, ekspor CSV terlebih dahulu.
-- Update dari preview sebelumnya mempertahankan riwayat di browser yang sama bila data situs tidak dihapus.
-
-
-V1.2 UPDATES:
-- QUICK SUB: tekan Quick Sub, tap pemain ON COURT yang keluar, lalu tap pemain BENCH yang masuk. Tidak perlu dropdown. Tap Batal Sub untuk keluar mode.
-- BOX SCORE otomatis diurutkan dari PTS tertinggi ke terendah untuk masing-masing tim, tie-break nama.
-- Tetap preview lokal; Firebase untuk sinkronisasi operator belum diaktifkan.
+NOTES
+- Firebase web apiKey is public client configuration, NOT an admin credential.
+- The app currently permits only the operator UID at the login gate, even though published database rules also allow the KING UID.
+- Existing scoreboard and KING Player Statistics paths are not modified by this ZIP.
+- Two-device live synchronization has not been tested against your actual KING Firebase database.
