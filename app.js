@@ -64,8 +64,41 @@ $('connectClock').onclick=connectClock;
 async function deleteMatch(id){const m=db.matches.find(x=>x.id===id);if(!m)return;
  if(m.status==='active')return toast('Selesaikan pertandingan LIVE sebelum menghapus.');
  if(!confirm('Hapus permanen '+m.homeName+' vs '+m.awayName+'?\nSemua statistik pertandingan ini akan dihapus dari Firebase. Game Clock tidak terpengaruh.'))return;
- try{await root.child('matches/'+id).remove();if(db.active===id)db.active=null;toast('Riwayat pertandingan dihapus');}catch(e){toast('Gagal menghapus: '+e.message)}}
-function listen(){root.child('matches').off();root.child('active').off();root.child('matches').on('value',snap=>{const val=snap.val()||{};db.matches=Object.values(val).sort((a,b)=>(b.created||0)-(a.created||0));render();showSync('● Tersinkron',true)},e=>{showSync('● Izin database ditolak',false);toast(e.message)});root.child('active').on('value',snap=>{const active=snap.val();if(active){db.active=active;render()}else if(!db.matches.some(m=>m.id===db.active&&m.status==='active')){db.active=null;render()}},e=>showSync('● Gagal membaca match',false))}
+ try{await root.child('matches/'+id).remove();if(db.active===id)db.active=null;schedulePublicProjection();toast('Riwayat pertandingan dihapus');}catch(e){toast('Gagal menghapus: '+e.message)}}
+
+// Public projection: NEVER copy the full match or private stat fields.
+// The public RTDB path contains only the active lineup and PTS/REB/AST.
+const publicRef=rtdb.ref('publicMatchStats/activeMatch');
+let publicationTimer=null;
+function schedulePublicProjection(){
+  if(!ready||!user)return;
+  clearTimeout(publicationTimer);
+  publicationTimer=setTimeout(publishPublicProjection,350);
+}
+async function publishPublicProjection(){
+  if(!ready||!user)return;
+  const activeId=await root.child('active').once('value').then(s=>s.val()).catch(()=>null);
+  const current=db.matches.find(m=>m.id===activeId&&m.status==='active');
+  if(!current){
+    // Clear only if this publication still belongs to a match no longer active.
+    await publicRef.transaction(v=>v&&(!activeId||v.matchId!==activeId)?null:undefined,undefined,false).catch(()=>{});
+    return;
+  }
+  const makeSide=t=>(current[t]||[]).filter(p=>p.playing).slice(0,5).map(p=>({
+    name:String(p.name||'').slice(0,64),
+    pts:2*(Number(p.stats?.p2m)||0)+3*(Number(p.stats?.p3m)||0)+(Number(p.stats?.ftm)||0),
+    reb:(Number(p.stats?.oreb)||0)+(Number(p.stats?.dreb)||0),
+    ast:Number(p.stats?.ast)||0
+  }));
+  const payload={matchId:current.id,homeName:String(current.homeName||'HOME').slice(0,64),awayName:String(current.awayName||'AWAY').slice(0,64),home:makeSide('home'),away:makeSide('away'),updatedAt:firebase.database.ServerValue.TIMESTAMP};
+  await publicRef.transaction(v=>{
+    // A delayed update from an older match must not replace the current match.
+    if(v&&v.matchId!==current.id&&Number(v.updatedAt||0)>Number(current.created||0))return;
+    return payload;
+  },undefined,false).catch(e=>console.warn('Public projection:',e.message));
+}
+
+function listen(){root.child('matches').off();root.child('active').off();root.child('matches').on('value',snap=>{const val=snap.val()||{};db.matches=Object.values(val).sort((a,b)=>(b.created||0)-(a.created||0));render();schedulePublicProjection();showSync('● Tersinkron',true)},e=>{showSync('● Izin database ditolak',false);toast(e.message)});root.child('active').on('value',snap=>{const active=snap.val();if(active){db.active=active;render();schedulePublicProjection()}else if(!db.matches.some(m=>m.id===db.active&&m.status==='active')){db.active=null;render();schedulePublicProjection()}},e=>showSync('● Gagal membaca match',false))}
 $('loginBtn').onclick=async()=>{const email=$('loginEmail').value.trim(),password=$('loginPassword').value;$('loginError').textContent='';try{const cred=await auth.signInWithEmailAndPassword(email,password);if(cred.user.uid!==operatorUid){await auth.signOut();throw Error('Akun ini tidak memiliki izin operator.')} }catch(e){$('loginError').textContent=e.message}};
 $('logoutBtn').onclick=()=>auth.signOut();
 auth.onAuthStateChanged(async u=>{if(u&&u.uid===operatorUid){user=u;ready=true;$('authGate').hidden=true;$('sessionBar').hidden=false;$('sessionText').textContent='Operator · '+(u.email||'');listen();connectClock()}else{user=null;ready=false;$('authGate').hidden=false;$('sessionBar').hidden=true;root.off();root.child('matches').off();root.child('active').off();if(clockTimer)clearInterval(clockTimer);if(clockRef)clockRef.off();latestClock=null;db={matches:[],active:null};render();if(u)await auth.signOut()}});
