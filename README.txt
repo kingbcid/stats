@@ -1,33 +1,26 @@
-COURTSIDE MATCH STATS V1.3 — KING BASKETBALL COMMUNITY
+COURTSIDE MATCH STATS V1.4 — KING Basketball Community
+Deploy all files to root of kingbcid/stats GitHub Pages repository.
 
-Website: https://kingbcid.github.io/stats/
-Repository: kingbcid/stats
-Firebase project: king-basketball-communit-311a2
-Realtime Database statistics path: /matchStatsV13
+CHANGES
+- MIN: reads /matches/main/state gameSec, period, gameRunning and syncedAt (read-only).
+- Uses a Firebase transaction on each stats match to accumulate the difference in scoreboard time
+  only once across operator devices. Counts time for the players on court.
+- Quick Sub first settles elapsed minutes before changing lineup.
+- Scoreboard scores are NEVER read into stats or written by this app.
+- History: finished matches have a permanent Delete action with confirmation.
+- Live matches must be finished before deleting.
 
-INSTALL
-1. Upload all files from ZIP root to the ROOT of repository stats, replacing existing files.
-2. Ensure GitHub Pages publishes the correct branch/root.
-3. Realtime Database Rules were already published by the owner: the matchStatsV13 node must allow the operator UID. DO NOT replace the whole rules with the partial JSON in this ZIP.
-4. Firebase Authentication must contain operator@gmail.com with UID xXCO21qUL2gmYQPmBU71BPcGXHB3 in THIS KING project.
-5. Login with the existing password (not included).
-6. Create one match; other device opens the same active match and selects HOME or AWAY.
-7. Scoreboard clock is read-only and expects /matches/main/state. If the KING scoreboard uses a different match ID, change COURTSIDE_SCOREBOARD_MATCH in firebase-config.js.
-8. Player MIN is not automatically calculated in V1.3.
-9. Public view is not enabled. Internet required.
-10. If an older version is still visible after deploy, hard-refresh or clear website cache.
+IMPORTANT LIMITATIONS
+- MIN starts when the stats match is created / scoreboard first connected, not retroactively.
+- Quarter transitions establish a new baseline; a small interval between final clock sample
+  and quarter switch may not be counted.
+- A scoreboard reset within the same quarter pauses MIN accumulation and shows a warning.
+  Create a NEW stats match for a new scoreboard game.
+- The clock must be reachable online. A gap in connectivity can be recovered within a quarter
+  using the clock difference, but quarter changes during a gap cannot be reconstructed.
+- MIN shown in the box score is committed at the latest successful sync; it may lag ~1-2 sec.
+- Existing Firebase Rules must allow the operator UID read access to /matches/main/state and
+  write access to /matchStatsV13. No scoreboard rules need to be changed.
+- Delete is permanent and cannot be undone.
 
-NOTES
-- Firebase web apiKey is public client configuration, NOT an admin credential.
-- The app currently permits only the operator UID at the login gate, even though published database rules also allow the KING UID.
-- Existing scoreboard and KING Player Statistics paths are not modified by this ZIP.
-- Two-device live synchronization has not been tested against your actual KING Firebase database.
-
-
-V1.3.1 FIX LOGIN MODAL
-- Login tampil sebagai popup overlay di tengah layar, bukan panel di atas halaman.
-- Popup otomatis hilang ketika Firebase Authentication berhasil.
-- Login kembali muncul jika logout / sesi tidak valid.
-- Inline critical CSS mengatasi stylesheet lama yang tersimpan di cache.
-- Service worker cache version diperbarui.
-Jika browser masih menampilkan versi lama, tekan Ctrl+Shift+R atau hapus data situs.
+Public View is not included.

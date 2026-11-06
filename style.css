@@ -9,3 +9,5 @@
 /* V1.3.1 popup login safeguard */
 #authGate:not([hidden]){position:fixed!important;inset:0!important;z-index:99999!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(3,10,24,.88)!important;backdrop-filter:blur(9px)!important}
 #authGate[hidden]{display:none!important}
+
+.history-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.delete-match{border-color:#a94444!important;color:#ff8585!important}.delete-match:hover{background:rgba(185,45,45,.15)!important}
