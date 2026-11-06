@@ -21,3 +21,9 @@ BATASAN PREVIEW
 - Tidak ada login, database publik, atau publikasi Box Score online.
 - Sebelum menghapus data situs/browser, ekspor CSV terlebih dahulu.
 - Update dari preview sebelumnya mempertahankan riwayat di browser yang sama bila data situs tidak dihapus.
+
+
+V1.2 UPDATES:
+- QUICK SUB: tekan Quick Sub, tap pemain ON COURT yang keluar, lalu tap pemain BENCH yang masuk. Tidak perlu dropdown. Tap Batal Sub untuk keluar mode.
+- BOX SCORE otomatis diurutkan dari PTS tertinggi ke terendah untuk masing-masing tim, tie-break nama.
+- Tetap preview lokal; Firebase untuk sinkronisasi operator belum diaktifkan.
