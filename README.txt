@@ -22,3 +22,12 @@ NOTES
 - The app currently permits only the operator UID at the login gate, even though published database rules also allow the KING UID.
 - Existing scoreboard and KING Player Statistics paths are not modified by this ZIP.
 - Two-device live synchronization has not been tested against your actual KING Firebase database.
+
+
+V1.3.1 FIX LOGIN MODAL
+- Login tampil sebagai popup overlay di tengah layar, bukan panel di atas halaman.
+- Popup otomatis hilang ketika Firebase Authentication berhasil.
+- Login kembali muncul jika logout / sesi tidak valid.
+- Inline critical CSS mengatasi stylesheet lama yang tersimpan di cache.
+- Service worker cache version diperbarui.
+Jika browser masih menampilkan versi lama, tekan Ctrl+Shift+R atau hapus data situs.
